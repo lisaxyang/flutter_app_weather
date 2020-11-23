@@ -65,10 +65,12 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _getWeather() async {
+    _checkStatusAll();
     final res = await http.get(_weatherlink);
     final parsed = json.decode(res.body);
     setState(() {
       _tempr = parsed.dataseries[0].temp2m;
+      print(_tempr);
     });
   }
 
