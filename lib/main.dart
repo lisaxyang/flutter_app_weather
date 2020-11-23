@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 void main() {
   runApp(MyApp());
@@ -34,11 +35,15 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _status = false;
   bool _status2 = false;
 
+  int _tempr = 0;
+
   String _link = "https://cs.brown.edu/courses/csci1300/";
   String _link2 = "https://signmeup.cs.brown.edu/";
+  String _weatherlink = "http://www.7timer.info/bin/astro.php?lon=-71.4&lat=41.8&ac=0&unit=metric&output=json&tzshift=0";
 
   void _checkStatus() async {
     final res = await http.get(_link);
+    print("it got here");
     setState(() {
       _status = res.statusCode == 200;
       // _link = parse(res.body).getElementByTagName('title').single.innerHtml;
@@ -54,9 +59,19 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _checkStatusAll() {
+    print(_link);
     _checkStatus();
     _checkStatus2();
   }
+
+  void _getWeather() async {
+    final res = await http.get(_weatherlink);
+    final parsed = json.decode(res.body);
+    setState(() {
+      _tempr = parsed.dataseries[0].temp2m;
+    });
+  }
+
 //   void _incrementCounter() {
 //     setState(() {
 //       _counter++;
@@ -88,16 +103,16 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             Text(
-              '$_status',
+              '$_tempr',
               style: Theme.of(context).textTheme.headline4,
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _checkStatusAll,
-        tooltip: 'Check Status',
-        child: Icon(Icons.network_check),
+        onPressed: _getWeather,
+        tooltip: 'Get Weather',
+        child: Icon(Icons.cloud_outlined),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
